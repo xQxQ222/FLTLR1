@@ -7,7 +7,7 @@ public class Main {
     private static MachineStarter starter = new MachineStarter();
 
     public static void main(String[] args) {
-        String text = "<!--abcd-->abcd\ndddddb<!--dbca---->";
+        String text = "<!--dbbbbba-->abcd\n101<!--da---->";
         starter.initAnalyzer(text);
         Token currentToken = new Token("", TokenType.UNKNOW, 0, 0);
         try {

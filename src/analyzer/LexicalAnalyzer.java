@@ -56,7 +56,6 @@ public class LexicalAnalyzer {
 
                     String result = runStateMachine(machine);
                     if (machineWorkSuccess) {
-                        // Если это комментарий, пропускаем его и ищем следующий токен
                         if (machine.getTokenType() == TokenType.COMMENT) {
                             skipUnrelatedSymbols();
                             if (currentSymbol.getType() == SymbolType.END_OF_TEXT) {
@@ -88,9 +87,7 @@ public class LexicalAnalyzer {
 
 
         while (true) {
-            // Проверяем, не достигли ли мы конца текста
             if (currentSymbol.getType() == SymbolType.END_OF_TEXT) {
-                // Если мы в незакрытом комментарии, это ошибка
                 if (machine.getTokenType() == TokenType.COMMENT && !currentState.isAccepting()) {
                     throw new LexicalException(MachineConstants.ERROR_UNCLOSED_COMMENT,
                             transliterator.getLineIndex(),
@@ -102,8 +99,25 @@ public class LexicalAnalyzer {
 
             Optional<State> optionalState = ruleSet.tryGetState(currentState, currentSymbol);
             if (optionalState.isEmpty()) {
-                // Проверка для идентификаторов: если мы в состоянии для слов, начинающихся с d
-                // и пытаемся прочитать 'a', это ошибка
+                if (machine.getTokenType() == TokenType.COMMENT) {
+                    String stateName = currentState.name();
+                    if (stateName.equals(MachineConstants.STATE_COMMENT_BODY) ||
+                        stateName.equals(MachineConstants.STATE_COMMENT_AFTER_FIRST_DASH) ||
+                        stateName.equals(MachineConstants.STATE_COMMENT_AFTER_DOUBLE_DASH)) {
+                        if (currentSymbol.getValue() != null && currentSymbol.getValue() != '-') {
+                            sb.append(currentSymbol.getValue());
+                            Optional<State> commentBodyStateOpt = ruleSet.getStateByName(MachineConstants.STATE_COMMENT_BODY);
+                            if (commentBodyStateOpt.isPresent()) {
+                                currentState = commentBodyStateOpt.get();
+                            } else {
+                                currentState = new State(MachineConstants.STATE_COMMENT_BODY, false);
+                            }
+                            currentSymbol = transliterator.getNextSymbol();
+                            continue;
+                        }
+                    }
+                }
+                
                 if (currentState.name().equals(MachineConstants.STATE_IDENTIFIER_D_START) 
                         && currentSymbol.getValue() != null 
                         && currentSymbol.getValue().equals('a')) {
@@ -114,7 +128,6 @@ public class LexicalAnalyzer {
                 machineWorkSuccess = currentState.isAccepting();
                 return sb.toString();
             }
-            // Добавляем символ только если он не null
             if (currentSymbol.getValue() != null) {
                 sb.append(currentSymbol.getValue());
             }

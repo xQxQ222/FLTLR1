@@ -33,7 +33,11 @@ public class RuleSet {
         if (symbol.getValue() == null) {
             return Optional.empty();
         }
-        Map<ClassifiedSymbol, State> stateMap = rules.getOrDefault(keyState, null);
+        Map<ClassifiedSymbol, State> stateMap = rules.entrySet().stream()
+                .filter(entry -> entry.getKey().name().equals(keyState.name()))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElse(null);
         if (stateMap == null) {
             return Optional.empty();
         }
@@ -41,5 +45,11 @@ public class RuleSet {
             return Optional.empty();
         }
         return Optional.of(stateMap.get(symbol));
+    }
+    
+    public Optional<State> getStateByName(String stateName) {
+        return rules.keySet().stream()
+                .filter(state -> state.name().equals(stateName))
+                .findFirst();
     }
 }
