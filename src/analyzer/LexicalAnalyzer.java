@@ -71,6 +71,12 @@ public class LexicalAnalyzer {
                     }
                 }
             }
+            
+            // Проверка одиночных символов (операторы и скобки)
+            Token singleCharToken = tryGetSingleCharToken();
+            if (singleCharToken != null) {
+                return singleCharToken;
+            }
         }
 
         String symbolValue = currentSymbol.getValue() != null ? currentSymbol.getValue().toString() : "null";
@@ -143,6 +149,33 @@ public class LexicalAnalyzer {
                 currentSymbol.getType() == SymbolType.END_OF_LINE)) {
             currentSymbol = transliterator.getNextSymbol();
         }
+    }
+
+    private Token tryGetSingleCharToken() {
+        if (currentSymbol == null || currentSymbol.getValue() == null) {
+            return null;
+        }
+        
+        char value = currentSymbol.getValue();
+        TokenType tokenType = null;
+        
+        switch (value) {
+            case ';' -> tokenType = TokenType.SEMICOLON;
+            case '=' -> tokenType = TokenType.EQUALS;
+            case '+' -> tokenType = TokenType.PLUS;
+            case '*' -> tokenType = TokenType.MULTIPLY;
+            case '(' -> tokenType = TokenType.LEFT_PAREN;
+            case ')' -> tokenType = TokenType.RIGHT_PAREN;
+            default -> {
+                return null;
+            }
+        }
+        
+        int tokenLineIndex = transliterator.getLineIndex();
+        int tokenInternalIndex = transliterator.getInternalIndex();
+        currentSymbol = transliterator.getNextSymbol();
+        
+        return new Token(String.valueOf(value), tokenType, tokenLineIndex, tokenInternalIndex);
     }
 
 
