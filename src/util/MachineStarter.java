@@ -27,14 +27,14 @@ public class MachineStarter {
 
     private StateMachine initNumberMachine() {
         State startState = new State("Num S", false);
-        State stateA = new State("Num A", false);  // после 0 в (011)*
-        State stateB = new State("Num B", false);  // после 01 в (011)*
-        State stateC = new State("Num C", false);  // после 011 в (011)*
-        State stateD = new State("Num D", false);  // после 1 перед 101
-        State stateE = new State("Num E", false);  // после 10 в 101
-        State stateFFin = new State("Num F Fin", true);  // после 101 (финальное)
-        State stateG = new State("Num G", false);  // после 11 в (110)*
-        State stateH = new State("Num H", false);  // после 110 в (110)*
+        State stateA = new State("Num A", false);
+        State stateB = new State("Num B", false);
+        State stateC = new State("Num C", false);
+        State stateD = new State("Num D", false);
+        State stateE = new State("Num E", false);
+        State stateFFin = new State("Num F Fin", true);
+        State stateG = new State("Num G", false);
+        State stateH = new State("Num H", false);
 
         ruleSet.addRule(startState, new ClassifiedSymbol('0'), stateA);
         ruleSet.addRule(startState, new ClassifiedSymbol('1'), stateD);
@@ -56,7 +56,6 @@ public class MachineStarter {
     }
 
     private StateMachine initIdentifierMachine() {
-        
         State startState = new State("Ident S", false);
         State stateAFin = new State("Ident A Fin", true);
         State stateBFin = new State("Ident B Fin", true);
@@ -83,12 +82,7 @@ public class MachineStarter {
         ));
     }
 
-    private void setCommentRule() {
-
-    }
-
     private StateMachine initCommentMachine() {
-        
         State startState = new State("Comment S", false);
         State stateA = new State("Comment A", false);
         State stateB = new State("Comment B", false);

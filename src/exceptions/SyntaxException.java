@@ -1,5 +1,7 @@
 package exceptions;
 
+import util.SyntaxConstants;
+
 public class SyntaxException extends Exception {
     private final int lineIndex;
     private final int internalIndex;
@@ -20,7 +22,7 @@ public class SyntaxException extends Exception {
 
     @Override
     public String getMessage() {
-        return String.format("Синтаксическая ошибка на строке %d, позиции %d: %s", 
+        return String.format(SyntaxConstants.SYNTAX_ERROR_FORMAT, 
                 lineIndex + 1, internalIndex + 1, super.getMessage());
     }
 }

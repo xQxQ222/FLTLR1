@@ -6,34 +6,32 @@ import util.MachineStarter;
 import exceptions.SyntaxException;
 
 public class Main {
-    private static MachineStarter starter = new MachineStarter();
+    private static final MachineStarter starter = new MachineStarter();
+    private static final String DEFAULT_TEXT = "abc = 101 + (dbb * 011101110) ; dcc = 101";
+    private static final String TOKEN_OUTPUT_FORMAT = "Токен: %s (тип: %s)";
+    private static final String SUCCESS_MESSAGE = "Синтаксический анализ завершен успешно!";
+    private static final String ERROR_PREFIX = "Ошибка: ";
 
     public static void main(String[] args) {
-        // Пример синтаксически корректного выражения:
-        // abc = 101 + (dbb * 011101110)
-        String text = "abc = 101 + (dbb * 011101110) ; dcc = 101";
+        String text = args.length > 0 ? String.join(" ", args) : DEFAULT_TEXT;
         
         try {
-            // Сначала выводим все токены
-            System.out.println("=== Лексический анализ ===");
             LexicalAnalyzer lexicalAnalyzerForTokens = starter.initAnalyzer(text);
             Token currentToken;
             do {
                 currentToken = lexicalAnalyzerForTokens.getNextToken();
-                System.out.println("Токен: " + currentToken.value() + " (тип: " + currentToken.type() + ")");
+                System.out.println(String.format(TOKEN_OUTPUT_FORMAT, currentToken.value(), currentToken.type()));
             } while (currentToken.type() != TokenType.END_OF_TEXT);
             
-            System.out.println("\n=== Синтаксический анализ ===");
-            // Создаем новый анализатор для синтаксического разбора
             LexicalAnalyzer lexicalAnalyzer = starter.initAnalyzer(text);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
             syntaxAnalyzer.parse();
             
-            System.out.println("Синтаксический анализ завершен успешно!");
+            System.out.println(SUCCESS_MESSAGE);
         } catch (SyntaxException ex) {
             System.out.println(ex.getMessage());
         } catch (Exception ex) {
-            System.out.println("Ошибка: " + ex.getMessage());
+            System.out.println(ERROR_PREFIX + ex.getMessage());
         }
     }
 }

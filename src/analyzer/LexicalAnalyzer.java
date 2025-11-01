@@ -72,7 +72,6 @@ public class LexicalAnalyzer {
                 }
             }
             
-            // Проверка одиночных символов (операторы и скобки)
             Token singleCharToken = tryGetSingleCharToken();
             if (singleCharToken != null) {
                 return singleCharToken;
@@ -90,7 +89,6 @@ public class LexicalAnalyzer {
         }
         StringBuilder sb = new StringBuilder();
         State currentState = machine.getInitialState();
-
 
         while (true) {
             if (currentSymbol.getType() == SymbolType.END_OF_TEXT) {
@@ -157,27 +155,17 @@ public class LexicalAnalyzer {
         }
         
         char value = currentSymbol.getValue();
-        TokenType tokenType = null;
         
         switch (value) {
-            case ';' -> tokenType = TokenType.SEMICOLON;
-            case '=' -> tokenType = TokenType.EQUALS;
-            case '+' -> tokenType = TokenType.PLUS;
-            case '*' -> tokenType = TokenType.MULTIPLY;
-            case '(' -> tokenType = TokenType.LEFT_PAREN;
-            case ')' -> tokenType = TokenType.RIGHT_PAREN;
+            case ';', '=', '+', '*', '(', ')' -> {
+                int tokenLineIndex = transliterator.getLineIndex();
+                int tokenInternalIndex = transliterator.getInternalIndex();
+                currentSymbol = transliterator.getNextSymbol();
+                return new Token(String.valueOf(value), TokenType.RESERVED, tokenLineIndex, tokenInternalIndex);
+            }
             default -> {
                 return null;
             }
         }
-        
-        int tokenLineIndex = transliterator.getLineIndex();
-        int tokenInternalIndex = transliterator.getInternalIndex();
-        currentSymbol = transliterator.getNextSymbol();
-        
-        return new Token(String.valueOf(value), tokenType, tokenLineIndex, tokenInternalIndex);
     }
-
-
-
 }
