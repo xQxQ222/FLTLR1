@@ -46,6 +46,10 @@ public class SyntaxAnalyzer {
 
     private void parseP() throws SyntaxException {
         parseA();
+        if (currentToken.type() == TokenType.END_OF_TEXT) {
+            throw new SyntaxException(SyntaxConstants.ERROR_INCOMPLETE_ASSIGNMENT,
+                    currentToken.lineIndex(), currentToken.internalIndex());
+        }
         matchReserved(ReservedSymbols.EQUALS);
         parseA();
     }
@@ -97,8 +101,11 @@ public class SyntaxAnalyzer {
 
     private void matchReserved(String expectedValue) throws SyntaxException {
         if (!isReserved(expectedValue)) {
+            String actualValue = currentToken.type() == TokenType.END_OF_TEXT ? 
+                    "END_OF_TEXT" : 
+                    (currentToken.value().isEmpty() ? currentToken.type().toString() : currentToken.value());
             throw new SyntaxException(
-                    String.format(SyntaxConstants.ERROR_EXPECTED_TOKEN, expectedValue, currentToken.value()),
+                    String.format(SyntaxConstants.ERROR_EXPECTED_TOKEN, expectedValue, actualValue),
                     currentToken.lineIndex(), currentToken.internalIndex());
         }
         try {
@@ -111,8 +118,11 @@ public class SyntaxAnalyzer {
 
     private void match(TokenType expectedType) throws SyntaxException {
         if (currentToken.type() != expectedType) {
+            String actualValue = currentToken.type() == TokenType.END_OF_TEXT ? 
+                    "END_OF_TEXT" : 
+                    (currentToken.value().isEmpty() ? currentToken.type().toString() : currentToken.value());
             throw new SyntaxException(
-                    String.format(SyntaxConstants.ERROR_EXPECTED_TOKEN, expectedType, currentToken.type()),
+                    String.format(SyntaxConstants.ERROR_EXPECTED_TOKEN, expectedType, actualValue),
                     currentToken.lineIndex(), currentToken.internalIndex());
         }
         try {
